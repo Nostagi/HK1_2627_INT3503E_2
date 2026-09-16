@@ -11,7 +11,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # move to demo folder
-cd "Lesson1-REST"   
+cd "Week1-Flask"
+   
 ```
 
 Thực hiện chạy server
