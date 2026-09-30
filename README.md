@@ -10,6 +10,6 @@ Repository lưu trữ các bài thực hành và bài tập của môn **Kiến 
 
 | Tuần   | Nội dung      | Thư mục                            |
 | ------ | ------------- | -----------------------------------|
-| Tuần 1 | REST API      | [`Lesson 1: REST`](./Lesson1-REST) |
-| Tuần 2 | Chưa cập nhật | —                                  |
+| Tuần 1 | Flask         | [`Week 1: Get into Flask`](./Week1-Flask) |
+| Tuần 2 | REST          | [`Week 2: REST`](./Week2-REST)                                  |
 

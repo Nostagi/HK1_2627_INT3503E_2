@@ -135,18 +135,18 @@ def list_books():
         
     page = max(page, 1); size = max(min(size, MAX_SIZE), 1)
 
-    # filter: author chính xác, q tìm trong title
-    flt = services.get_all_books()
+    query = {
+        "author": request.args.get("author"),
+        "q": (request.args.get("q")or"").lower()
+    }
 
-    a = request.args.get("author")
-    if a: flt = [b for b in flt if b["author"].lower()==a.lower()]
-
-    q = (request.args.get("q")or"").lower()
-    if q: flt = [b for b in flt if q in b["title"].lower()]
+    flt = services.get_book(query)
 
     # paginate
-    total = len(flt); start=(page-1)*size; end=start+size
-    items = flt[start:end]; last=(total+size-1)//size
+    total = len(flt);
+    start=(page-1)*size; end=start+size
+    items = flt[start:end] 
+    last=(total+size-1)//size
 
     # HATEOAS links
     def u(p): 
@@ -175,6 +175,7 @@ def list_books():
     resp = make_response(jsonify(body), 200)
     resp.headers["Cache-Control"]="public, max-age=30"
     return resp
+
 
 # ============================================================
 # APPLICATION START
