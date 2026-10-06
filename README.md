@@ -8,8 +8,8 @@ Repository lưu trữ các bài thực hành và bài tập của môn **Kiến 
 
 ## Danh sách bài tập
 
-| Tuần   | Nội dung      | Thư mục                            |
-| ------ | ------------- | -----------------------------------|
-| Tuần 1 | Flask         | [`Week 1: Get into Flask`](./Week1-Flask) |
-| Tuần 2 | REST          | [`Week 2: REST`](./Week2-REST)                                  |
-
+| Tuần   | Nội dung      | Thư mục                                      |
+| ------ | ------------- | -----------------------------------          |
+| Tuần 1 | Flask         | [`Week 1: Get into Flask`](./Week1-Flask)    |
+| Tuần 2 | REST          | [`Week 2: REST`](./Week2-REST)               |
+| Tuần 3 | REST Design   | [`Week 3: REST API Design`](./Week3-Design)  |
