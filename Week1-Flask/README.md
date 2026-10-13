@@ -1,29 +1,6 @@
 # Introduction to REST/json with Flask
 
-## 1. Setup virtual environment
 
-Linux / macOS
-
-``` terminal
-
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# move to demo folder
-cd "Week1-Flask"
-   
-```
-
-Thực hiện chạy server
-
-```terminal
-
-python3 -m '<tên file>'
-
-```
-
-Các server mặc định chạy tại: [http://127.0.0.1:5000] hay localhost:5000
 
 ## 2. [App](./app.py)
 

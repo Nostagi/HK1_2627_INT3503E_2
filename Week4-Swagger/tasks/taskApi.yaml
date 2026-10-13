@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: Internal Task Management API
+  version: 1.0.0
+  description: API quản lý task nội bộ — bao gồm schemas và error responses theo chuẩn RFC 7807.
+
+paths:
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [tasks]
+      summary: List all tasks
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: status
+          in: query
+          description: Filter tasks by status
+          required: false
+          schema:
+            type: string
+            enum: [todo, in_progress, done, cancelled]
+        - name: assignedID
+          in: query
+          description: Filter tasks by assigned user ID
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A paged array of tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tasks'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tasks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The id of the task
+        schema:
+          type: integer
+          format: int64
+    get:
+      operationId: showTaskById
+      tags: [tasks]
+      summary: Info for a specific task
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Task not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a specific task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Task not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a specific task
+      responses:
+        '204':
+          description: Task deleted successfully (No Content)
+        '404':
+          description: Task not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - priority
+        - dueDate
+        - assignedID
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+          example: "Fix login bug"
+        status:
+          type: string
+          description: Current status of the task
+          enum: [todo, in_progress, done, cancelled]
+          example: "in_progress"
+        priority:
+          type: string
+          description: Priority level of the task
+          enum: [low, medium, high, urgent]
+          example: "high"
+        dueDate:
+          type: string
+          format: date
+          description: Deadline for the task (ISO 8601 date)
+          example: "2025-12-31"
+        assignedID:
+          type: integer
+          format: int64
+          description: ID of the user the task is assigned to
+          example: 42
+
+    TaskInput:
+      type: object
+      description: Payload used to create a new task
+      required:
+        - title
+        - status
+        - priority
+        - dueDate
+        - assignedID
+      properties:
+        title:
+          type: string
+          example: "Fix login bug"
+        status:
+          type: string
+          enum: [todo, in_progress, done, cancelled]
+          example: "todo"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          example: "medium"
+        dueDate:
+          type: string
+          format: date
+          example: "2025-12-31"
+        assignedID:
+          type: integer
+          format: int64
+          example: 42
+
+    TaskUpdate:
+      type: object
+      description: Payload used to partially update a task
+      properties:
+        title:
+          type: string
+          example: "Fix login bug (revised)"
+        status:
+          type: string
+          enum: [todo, in_progress, done, cancelled]
+          example: "done"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          example: "urgent"
+        dueDate:
+          type: string
+          format: date
+          example: "2026-01-15"
+        assignedID:
+          type: integer
+          format: int64
+          example: 7
+
+    Tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/Task'
+
+    Error:
+      type: object
+      description: Standard error response following RFC 7807 (Problem Details for HTTP APIs)
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference that identifies the problem type.
+          example: "https://example.com/probs/task-not-found"
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type.
+          example: "Task not found."
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code generated by the origin server for this occurrence of the problem.
+          example: 404
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+          example: "Task with id 123 does not exist."
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence of the problem.
+          example: "/tasks/123"
