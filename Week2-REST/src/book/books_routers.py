@@ -13,6 +13,10 @@ LOCALHOST: dict = {
     "debug": True,
 }
 
+# ============================================================
+# Simple CRUD
+# ============================================================
+
 # ─── GET /books —— trả danh sách
 @app.get("/books/all")
 def list_books():
@@ -21,6 +25,18 @@ def list_books():
         "data": all_books,
         "total": len(all_books)
     }), 200
+
+
+# ─── GET /books/<id> ─── cache 60s
+@app.get("/books/<int:bid>")
+def fetch(bid):
+    _, book = services.find_by_id(bid) 
+    if book is None: 
+        return jsonify(error="not found"), 404
+
+    resp = make_response(jsonify(book), 200)
+    resp.headers["Cache-Control"]="max-age=60"
+    return resp
 
 
 # ─── POST /books —— tạo mới
@@ -45,16 +61,6 @@ def create_book():
     resp.headers["Location"] = f"/books/{book['id']}"
     return resp
 
-# ─── GET /books/<id> ─── cache 60s
-@app.get("/books/<int:bid>")
-def fetch(bid):
-    _, book = services.find_by_id(bid) 
-    if book is None: 
-        return jsonify(error="not found"), 404
-
-    resp = make_response(jsonify(book), 200)
-    resp.headers["Cache-Control"]="max-age=60"
-    return resp
 
 # ─── PUT /books/<id> ─── thay toàn bộ, title+author bắt buộc
 @app.put("/books/<int:bid>")
@@ -82,6 +88,7 @@ def put(bid):
     )
     return jsonify(new_data), 200
 
+
 # ─── PATCH /books/<id> ─── chỉ cập nhật field có trong body
 @app.patch("/books/<int:bid>")
 def patch(bid):
@@ -106,6 +113,7 @@ def patch(bid):
         replacement=False
     )
     return jsonify(new_data), 200
+
 
 # ─── DELETE /books/<id> ─── idempotent, trả 204
 @app.delete("/books/<int:bid>")

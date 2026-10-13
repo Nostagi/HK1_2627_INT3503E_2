@@ -14,14 +14,21 @@ Endpoint: GET /orders
 
 ```markdown
 /lab3
-├── exception.py           Exception Handler (copy từ lab2)
-├── orders_api.py          Implement `/orders` với pagination    
-├── orders_db.py           Database mẫu với SQLite 
-├── orders_api.py          Implement `/orders` với pagination
+├── /src
+│    ├── exception.py           Exception Handler (copy từ lab2)
+│    ├── orders_app.py          Implement `/orders` với pagination    
+│    ├── orders_db.py           Database mẫu với SQLite 
+│    └── orders.db              Database giả (SQLite) được tạo ra khi chạy application.
 └── README                 
 ```
 
 ## Kiểm thử
+
+Khởi chạy application:
+    ```terminal
+    # Nếu đang ở tại dir: [/Week3-Design]
+    python3 -m "lab3.src.orders_app"
+    ```
 
 Giả định Flask đang chạy tại `localhost:5000` (việc khởi chạy cũng sẽ tự tạo database với dữ liệu giả).
 

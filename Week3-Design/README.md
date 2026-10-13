@@ -8,8 +8,6 @@
 
 ## Vận dụng: review một public API
 
-### Danh sách 9 tiêu chí Review API
-
 Case study được thực hiện với: **Stripe API**
 
 ### Giới thiệu về Stripe API
@@ -58,21 +56,23 @@ Sơ đồ Endpoint (một số thành phần tiêu biểu):
              └── DELETE /{sub_id}        → Hủy subscription
     ```
 
-### 1. *Tài nguyên là danh từ*
+### Đánh giá Stripe API theo 9 tiêu chí
+
+#### 1. *Tài nguyên là danh từ*
 
 URLs chỉ chứa danh từ, không chứa động từ. Hành động được diễn đạt thông qua HTTP Method (GET, POST, PUT, DELETE...).
 
 **Đánh giá**: Đạt.
 Như sơ đồ endpoint ta cũng có thể thấy, các resource (ví dụ: customers, payment_intents, subcriptions,...) đều mô tả bằng danh từ số nhiều (Collections), và định danh item bằng `id` bổ sung trong endpoint.
 
-### 2. *Naming nhất quán*
+#### 2. *Naming nhất quán*
 
 Sử dụng lowercase, kebab-case cho path; snake_case cho query; dùng dạng số nhiều (plurals) cho collection (ví dụ: /users thay vì /user).
 
 **Đánh giá**: Nhất quán, nhưng theo convention khác.
 Các endpoint đều được lower-case và duy trì xuyên suốt mô tả Collection bằng danh từ số nhiều. Việc truy cập item (số ít) thực hiện phải thông qua bổ sung `<id>`. Tuy nhiên, họ sử dụng *Snake_case* thay vì *Kebab-case* cho path (ví dụ: payment_intents), nhưng các endpoint trong hệ thống vẫn thống nhất theo quy ước riêng đó.  
 
-### 3. *Status code đúng nghĩa*
+#### 3. *Status code đúng nghĩa*
 
 Mỗi response phải trả về HTTP status code phù hợp. Tuyệt đối không trả về 200 OK kèm theo lỗi trong body.
 
@@ -85,7 +85,7 @@ Stripe sử dụng standard HTTP status codes một cách chính xác. Ví dụ:
 
 Stripe cũng không trả về 200 OK kèm lỗi trong body. Khi có lỗi, status code sẽ là 4xx hoặc 5xx tương ứng.
 
-### 4. *Idempotency rõ ràng*
+#### 4. *Idempotency rõ ràng*
 
 POST cần có Idempotency-Key. PUT/DELETE phải đảm bảo tính idempotent (gọi nhiều lần kết quả vẫn giống nhau). Cần tài liệu hóa rõ ràng.
 
@@ -93,7 +93,7 @@ POST cần có Idempotency-Key. PUT/DELETE phải đảm bảo tính idempotent 
 
 Tất cả POST requests đều chấp nhận header Idempotency-Key (tối đa 255 ký tự). Key này sẽ được lưu trữ ít nhất 24 giờ. Nếu cùng key được gửi lại với cùng body, Stripe trả về kết quả của request gốc mà không thực hiện lại nghiệp vụ. Stripe khuyến nghị thêm idempotency-key cho mọi POST request, đặc biệt là các request tạo thanh toán (POST /v1/charges, POST /v1/payment_intents).
 
-### 5. *Error response có cấu trúc*
+#### 5. *Error response có cấu trúc*
 
 Tuân thủ chuẩn RFC 7807 (problem+json). Cấu trúc lỗi nhất quán, bao gồm các trường: type, title, detail, instance.
 
@@ -101,18 +101,18 @@ Tuân thủ chuẩn RFC 7807 (problem+json). Cấu trúc lỗi nhất quán, bao
 
 Stripe trả về error response với cấu trúc nhất quán, bao gồm các trường sau:
 
-| Trường            | Mô tả                                                             |
-| ------            | -------------                                                     |
-| type	            | Loại lỗi (ví dụ: card_error, invalid_request_error, api_error)    |
-| code	            | Mã lỗi cụ thể (ví dụ: card_declined, parameter_missing)           |
-| message           |	Mô tả lỗi dạng human-readable                                   |
-| param	            | Tham số gây lỗi (nếu có)                                          |
-| doc_url           |	Link đến documentation của Stripe cho mã lỗi đó                 |
-| request_log_url   |	Link đến dashboard để xem log chi tiết                          |
+| Trường            | Mô tả                                                           |
+| ------------------| ----------------------------------------------------------------|
+| type              | Loại lỗi (ví dụ: card_error, invalid_request_error, api_error)  |
+| code              | Mã lỗi cụ thể (ví dụ: card_declined, parameter_missing)         |
+| message           | Mô tả lỗi dạng human-readable                                   |
+| param             | Tham số gây lỗi (nếu có)                                        |
+| doc_url           | Link đến documentation của Stripe cho mã lỗi đó                 |
+| request_log_url   | Link đến dashboard để xem log chi tiết                          |
 
 Mặc dù cấu trúc rõ ràng như vậy, Stripe sử dụng format riêng (không có application/problem+json media type theo RFC 7807).
 
-### 6. *Pagination rõ ràng*
+#### 6. *Pagination rõ ràng*
 
 Mọi collection đều phải có phân trang (cursor hoặc offset). Phải có giới hạn trên (max limit) cho mỗi page.
 
@@ -135,7 +135,7 @@ Parameters:
     }
     ```
 
-### 7. *Filter/Sort đa dạng*
+#### 7. *Filter/Sort đa dạng*
 
 Hỗ trợ lọc (filter) theo các field chính, sắp xếp (sort) theo nhiều field, và hỗ trợ sparse fieldsets (chỉ lấy các field cần thiết).
 
@@ -143,7 +143,7 @@ Hỗ trợ lọc (filter) theo các field chính, sắp xếp (sort) theo nhiề
 
 Stripe hỗ trợ filtering và sorting khá linh hoạt trên các list endpoints. Nhưng không hỗ trựo *custom sort field* và *sparse fieldsets*. Ít nhất thì hạn chế này vẫn tồn tại hết v1, và được cải thiện dần ở v2.
 
-### 8. *Authentication & security*
+#### 8. *Authentication & security*
 
 Token phải nằm ở header (không lộ qua URL). Có cơ chế Rate limit rõ ràng.
 
@@ -151,7 +151,7 @@ Token phải nằm ở header (không lộ qua URL). Có cơ chế Rate limit r�
 
 Stripe xác thực thông qua API key (Secret Key) truyền qua header. Hỗ trợ đầy đủ Publishable Key, Restricted Key, Rate Limit và cả Webhook (hỗ trợ cho chữ ký số).
 
-### 9. *Versioning + deprecation*
+#### 9. *Versioning + deprecation*
 
 Có tiền tố version ngay từ đầu (ví dụ: /v1/). Có lộ trình rõ ràng cho việc ngừng hỗ trợ (deprecation) các phiên bản cũ.
 
