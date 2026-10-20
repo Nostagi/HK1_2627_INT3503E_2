@@ -1,0 +1,184 @@
+{
+  "User": {
+    "description": "Đại diện cho người dùng (độc giả) trong hệ thống thư viện số.",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "ID định danh duy nhất của người dùng"
+      },
+      "username": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 50,
+        "description": "Tên đăng nhập (duy nhất)"
+      },
+      "fullName": {
+        "type": "string",
+        "description": "Họ và tên"
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "joinedAt": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Thời điểm đăng ký tài khoản"
+      }
+    },
+    "required": ["id", "username", "email"]
+  },
+  "Chapter": {
+    "description": "Đại diện cho một chương của cuốn sách. Được tách riêng để quản lý nội dung và quyền truy cập độc lập.",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "ID định danh của chương"
+      },
+      "bookId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "ID của cuốn sách chứa chương này"
+      },
+      "title": {
+        "type": "string",
+        "description": "Tiêu đề chương"
+      },
+      "content": {
+        "type": "string",
+        "description": "Nội dung chi tiết của chương (có thể là text hoặc URL tùy thuộc vào endpoint trả về)"
+      },
+      "issueDate": {
+        "type": "string",
+        "format": "date",
+        "description": "Ngày phát hành/cập nhật chương"
+      }
+    },
+    "required": ["id", "bookId", "title"]
+  },
+  "Book": {
+    "description": "Đại diện cho một cuốn sách trong hệ thống, chứa metadata và danh sách các chương trực thuộc.",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "description": "Tựa đề sách"
+      },
+      "author": {
+        "type": "string",
+        "description": "Tác giả"
+      },
+      "categories": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Danh sách thể loại"
+      },
+      "issueDate": {
+        "type": "string",
+        "format": "date",
+        "description": "Ngày xuất bản"
+      },
+      "chapters": {
+        "type": "array",
+        "description": "Danh sách các chương thuộc cuốn sách này",
+        "items": {
+          "$ref": "#/Chapter"
+        }
+      }
+    },
+    "required": ["id", "title", "author", "chapters"]
+  },
+  "Request": {
+    "description": "Đại diện cho một yêu cầu mượn tài liệu (sách hoặc chương) của người dùng.",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "userId": {
+        "type": "string",
+        "description": "ID người mượn"
+      },
+      "targetType": {
+        "type": "string",
+        "enum": ["book", "chapter"],
+        "description": "Mượn nguyên cuốn sách hay chỉ mượn 1 chương"
+      },
+      "targetId": {
+        "type": "string",
+        "description": "ID của Book hoặc Chapter tương ứng",
+        "$ref": "#/Chapter #/Book"
+      },
+      "issueDate": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Thời điểm bắt đầu mượn"
+      },
+      "expiration": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Thời điểm hết hạn"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "active", "returned", "expired", "overdue", "cancelled"],
+        "description": "Trạng thái của yêu cầu"
+      },
+      "fee": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Phí mượn (nếu có)"
+      }
+    },
+    "required": ["id", "userId", "targetType", "targetId", "issueDate", "expiration", "status"]
+  },
+  "Review": {
+    "description": "Đại diện cho một đánh giá của người dùng. Hỗ trợ đa hình (polymorphic) để đánh giá Sách hoặc Chương.",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "userId": {
+        "type": "string",
+        "description": "ID người viết đánh giá"
+      },
+      "targetType": {
+        "type": "string",
+        "enum": ["book", "chapter", "review"],
+        "description": "Đối tượng được đánh giá (Sách hoặc Chương)"
+      },
+      "targetId": {
+        "type": "string",
+        "description": "ID của Book hoặc Chapter tương ứng",
+        "$ref": "#/Chapter #/Book #/Review"
+      },
+      "rating": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5,
+        "description": "Điểm đánh giá từ 1 đến 5 sao"
+      },
+      "content": {
+        "type": "string",
+        "description": "Nội dung bình luận/đánh giá"
+      },
+      "createdAt": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Thời điểm viết đánh giá"
+      }
+    },
+    "required": ["id", "userId", "targetType", "targetId", "rating", "content", "createdAt"]
+  }
+}

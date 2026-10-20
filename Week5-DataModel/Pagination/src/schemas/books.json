@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Book",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "description": "Format: book_{id}" },
+    "title": { "type": "string" },
+    "price_vnd": { "type": "integer" },
+    "isbn": { "type": "string" },
+    "stock": { "type": "integer" },
+    "category_id": { "type": "integer" }
+  },
+  "required": ["id", "title", "price_vnd"]
+}
