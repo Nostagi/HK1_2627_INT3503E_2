@@ -1,0 +1,301 @@
+openapi: 3.0.3
+info:
+  title: Minimal Threads-like Social Network API
+  description: >
+    API cho hệ thống mạng xã hội tối giản (tương tự Threads).
+    Hỗ trợ chức năng đăng bài viết công khai, reply bài viết, sửa/xóa bài cá nhân và xác thực người dùng.
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com/v1
+    description: Example
+
+tags:
+  - name: Auth
+    description: Quản lý xác thực và phân quyền
+  - name: Posts
+    description: Quản lý bài viết và reply
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Xác thực người dùng
+      description: Đăng nhập bằng email và mật khẩu để nhận Access Token và Refresh Token.
+      operationId: loginUser
+      security: [] # Public endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ (thiếu email/password)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Sai thông tin đăng nhập
+        '429':
+          description: Gửi request quá nhiều lần (Rate limit / Brute-force protection)
+        '500':
+          description: Lỗi hệ thống
+
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Làm mới Access Token
+      description: Sử dụng Refresh Token hợp lệ để lấy Access Token mới mà không cần đăng nhập lại.
+      operationId: refreshToken
+      security: [] # Sử dụng refresh_token trong body, không bắt buộc truyền access_token ở header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Làm mới token thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Thiếu Refresh Token
+        '401':
+          description: Refresh Token không hợp lệ, đã hết hạn hoặc bị thu hồi
+        '500':
+          description: Lỗi hệ thống
+
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Lấy chi tiết bài viết
+      description: |
+        Lấy thông tin của một bài viết cụ thể. 
+        Endpoint này là public (Owner và mọi Reader đều có thể đọc). Không yêu cầu scope `write:posts`.
+      operationId: getPostById
+      security: [] # Public endpoint cho mọi người đọc
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID của bài viết
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Trả về chi tiết bài viết
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Định dạng ID không hợp lệ
+        '404':
+          description: Không tìm thấy bài viết
+        '500':
+          description: Lỗi hệ thống
+
+    put:
+      tags:
+        - Posts
+      summary: Chỉnh sửa bài viết
+      description: |
+        Chủ sở hữu (Owner) chỉnh sửa nội dung bài viết của mình. 
+        Yêu cầu Access Token có scope `write:posts` và phải qua bước kiểm tra Ownership.
+      operationId: updatePost
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '200':
+          description: Cập nhật thành công
+        '401':
+          description: Chưa xác thực (Token sai/hết hạn)
+        '403':
+          description: Không có quyền (Forbidden - BOLA nếu không phải Owner)
+        '404':
+          description: Không tìm thấy bài viết
+
+    delete:
+      tags:
+        - Posts
+      summary: Xóa bài viết
+      description: |
+        Chủ sở hữu (Owner) xóa bài viết.
+        Yêu cầu Access Token hợp lệ và sở hữu bài viết đó.
+      operationId: deletePost
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Xóa thành công (No content)
+        '401':
+          description: Chưa xác thực
+        '403':
+          description: Không có quyền (Không phải là tác giả)
+        '404':
+          description: Không tìm thấy bài viết
+
+  /posts:
+    post:
+      tags:
+        - Posts
+      summary: Tạo bài viết mới / Reply
+      description: |
+        Người dùng đăng bài mới hoặc reply một bài khác (bằng cách truyền `reply_to_id`).
+        Yêu cầu xác thực với scope `write:posts`.
+      operationId: createPost
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '201':
+          description: Đăng bài thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bài viết trống hoặc reply_to_id không tồn tại
+        '401':
+          description: Chưa đăng nhập
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Truyền JWT Access Token vào header: `Authorization: Bearer <token>`.
+        - Scopes áp dụng cho User (Owner): `read:posts`, `write:posts`.
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: strong_password_123
+
+    RefreshRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh_payload..."
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1..."
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1..."
+        expires_in:
+          type: integer
+          example: 900
+          description: Thời gian hết hạn của access_token tính bằng giây (vd: 900s = 15 phút)
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        author_id:
+          type: string
+          format: uuid
+          example: "987e6543-e21b-34d3-a456-426614174000"
+        content:
+          type: string
+          example: "Đây là một bài post mới trên hệ thống!"
+        reply_to_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID của bài viết được reply. Null nếu là bài viết gốc.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PostRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          maxLength: 500
+          example: "Nội dung bài viết mới hoặc câu trả lời."
+        reply_to_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Gửi id của bài viết khác nếu đây là một hành động reply.
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "invalid_credentials"
+        message:
+          type: string
+          example: "Email hoặc mật khẩu không chính xác."

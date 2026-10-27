@@ -8,12 +8,15 @@ Repository lưu trữ các bài thực hành và bài tập của môn **Kiến 
 
 ## Danh sách bài tập
 
-| Tuần   | Nội dung                 | Thư mục                                               |
-| ------ | -------------------------| ------------------------------------------------------|
-| Tuần 1 | Flask                    | [`Week 1: Get into Flask`](./Week1-Flask)             |
-| Tuần 2 | REST                     | [`Week 2: REST`](./Week2-REST)                        |
-| Tuần 3 | REST Design              | [`Week 3: REST API Design`](./Week3-Design)           |
-| Tuần 4 | REST API Specification   | [`Week 4: REST API Specification`](./Week4-Swagger/)  |
+| Tuần   | Nội dung               | Thư mục                                              |
+| ------ | ---------------------- | ---------------------------------------------------- |
+| Tuần 1 | Flask                  | [`Week 1: Get into Flask`](./Week1-Flask)            |
+| Tuần 2 | REST                   | [`Week 2: REST`](./Week2-REST)                       |
+| Tuần 3 | REST Design            | [`Week 3: REST API Design`](./Week3-Design)          |
+| Tuần 4 | REST API Specification | [`Week 4: REST API Specification`](./Week4-Swagger/) |
+| Tuần 5 | Data Model             | [`Week 5: Data Model`](./Week5-DataModel/)           |
+| Tuần 6 | Auth                   | [`Week 6: Auth`](./Week6-Auth/)                      |
+
 
 ## Hướng dẫn cài đặt
 
@@ -24,9 +27,9 @@ Repository lưu trữ các bài thực hành và bài tập của môn **Kiến 
     python3 -m venv .venv
     source .venv/bin/activate
 
-    # Di chuyển tới demo 
+    # Di chuyển tới demo
     # Tùy chỉnh lại theo tên thư mục cần chạy. Ví dụ với Week 1:
-    cd "Week1-Flask"        
+    cd "Week1-Flask"
 
     # Cài đặt dependencies yêu cầu của thư mực đó
     pip install -r requirements.txt
