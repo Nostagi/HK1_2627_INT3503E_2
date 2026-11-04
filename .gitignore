@@ -1,3 +1,5 @@
 /Lesson1-REST/__pycache__
 /.venv
 /Week2-REST/__pycache__
+/Week7-Code1st/Lab1/products-api/__pycache__
+*.pyc

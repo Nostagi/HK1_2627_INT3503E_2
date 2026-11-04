@@ -10,7 +10,7 @@ Implement một BookAPI đơn giản và áp dụng sort và pagination (theo 2 
 
 -> Danh sách endpoint: GET /tasks, POST, GET /:id, PATCH, DELETE
 
-### Mã nguồn: [tasks](./tasks/)
+### Mã nguồn: [pagination](./Pagination)
 
 ### Cấu trúc thư mục
 
