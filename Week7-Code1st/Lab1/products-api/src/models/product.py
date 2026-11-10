@@ -1,10 +1,11 @@
+import __future__
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from src.extensions import db
-
 
 class Product(db.Model):
     __tablename__ = "products"
@@ -42,3 +43,7 @@ class Product(db.Model):
         if self.archived:
             return "archived"
         return "in_stock" if self.qty_in_stock > 0 else "out_of_stock"
+
+    order_items: Mapped[list["OrderItem"]] = relationship(
+        back_populates="product",
+    )

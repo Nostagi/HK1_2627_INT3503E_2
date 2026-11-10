@@ -8,15 +8,15 @@ Repository lưu trữ các bài thực hành và bài tập của môn **Kiến 
 
 ## Danh sách bài tập
 
-| Tuần   | Nội dung               | Thư mục                                              |
-| ------ | ---------------------- | ---------------------------------------------------- |
-| Tuần 1 | Flask                  | [`Week 1: Get into Flask`](./Week1-Flask)            |
-| Tuần 2 | REST                   | [`Week 2: REST`](./Week2-REST)                       |
-| Tuần 3 | REST Design            | [`Week 3: REST API Design`](./Week3-Design)          |
-| Tuần 4 | REST API Specification | [`Week 4: REST API Specification`](./Week4-Swagger/) |
-| Tuần 5 | Data Model             | [`Week 5: Data Model`](./Week5-DataModel/)           |
-| Tuần 6 | Auth                   | [`Week 6: Auth`](./Week6-Auth/)                      |
-
+| Tuần   | Nội dung                 | Thư mục                                              |
+| ------ | -------------------------| ---------------------------------------------------- |
+| Tuần 1 | Flask                    | [`Week 1: Get into Flask`](./Week1-Flask)            |
+| Tuần 2 | REST                     | [`Week 2: REST`](./Week2-REST)                       |
+| Tuần 3 | REST Design              | [`Week 3: REST API Design`](./Week3-Design)          |
+| Tuần 4 | REST API Specification   | [`Week 4: REST API Specification`](./Week4-Swagger/) |
+| Tuần 5 | Data Model               | [`Week 5: Data Model`](./Week5-DataModel/)           |
+| Tuần 6 | Auth                     | [`Week 6: Auth`](./Week6-Auth/)                      |
+| Tuần 7 | Backend (build & deploy) | [`Week 7: Backend (Code First)`](./Week7-Code1st/)                      |
 
 ## Hướng dẫn cài đặt
 

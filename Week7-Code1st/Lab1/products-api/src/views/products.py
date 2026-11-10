@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from sqlalchemy import func, or_
+from sqlalchemy.orm import selectinload
 
 from src.handlers.exception import Conflict, NotFound
 from src.extensions import db
@@ -13,7 +14,10 @@ from src.schemas.product import (
 )
 
 products_bp = Blueprint(
-    "products", __name__, url_prefix="/api/v1/products", description="Products operations"
+    "products", 
+    __name__, 
+    url_prefix="/api/v1/products", 
+    description="Products operations"
 )
 
 
@@ -68,6 +72,8 @@ class ProductListResource(MethodView):
     @products_bp.arguments(ProductInSchema)
     @products_bp.response(201, ProductOutSchema)
     def post(self, data):
+        """POST tạo sản phẩm mới`."""
+
         if db.session.scalar(db.select(Product).where(Product.sku == data["sku"])):
             raise Conflict(f"SKU '{data['sku']}' already exists")
         product = Product(**data)
@@ -80,6 +86,8 @@ class ProductListResource(MethodView):
 class ProductResource(MethodView):
     @products_bp.response(200, ProductOutSchema)
     def get(self, product_id: int):
+        """GET chi tiết sản phẩm."""
+
         p = db.session.get(Product, product_id)
         if not p:
             raise NotFound(f"Product {product_id} not found")
@@ -88,6 +96,8 @@ class ProductResource(MethodView):
     @products_bp.arguments(ProductPatchSchema)
     @products_bp.response(200, ProductOutSchema)
     def patch(self, data, product_id: int):
+        """PATCH cập nhật thông tin sản phẩm."""
+
         p = db.session.get(Product, product_id)
         if not p:
             raise NotFound(f"Product {product_id} not found")
@@ -98,6 +108,8 @@ class ProductResource(MethodView):
 
     @products_bp.response(204)
     def delete(self, product_id: int):
+        """DELETE xóa sản phẩm."""
+
         p = db.session.get(Product, product_id)
         if not p:
             raise NotFound(f"Product {product_id} not found")
